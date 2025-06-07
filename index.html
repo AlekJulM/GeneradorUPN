@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generador de Contraseñas Seguras</title>
+    <link rel="stylesheet" href="styles.css">
+    <meta name="description" content="Generador de contraseñas seguras con base matemática">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Generador de Contraseñas Seguras</h1>
+            <p>Matemáticamente seguro, visualmente intuitivo</p>
+        </header>
+
+        <main>
+            <!-- Sección de Controles -->
+            <section class="controls-section">
+                <div class="length-control">
+                    <label for="passwordLength" id="lengthLabel">Longitud: 8 caracteres</label>
+                    <div class="slider-container">
+                        <input type="range" id="passwordLength" min="5" max="15" value="8" class="slider">
+                    </div>
+                </div>
+                  <div class="character-sets">
+                    <button id="lowercase" class="toggle-btn active" aria-pressed="true" title="Haga clic para activar/desactivar las letras minúsculas">
+                        <span class="icon">a</span> Minúsculas (a-z)
+                        <span class="sr-only">(Activado)</span>
+                    </button>
+                    <button id="uppercase" class="toggle-btn active" aria-pressed="true" title="Haga clic para activar/desactivar las letras mayúsculas">
+                        <span class="icon">A</span> Mayúsculas (A-Z)
+                        <span class="sr-only">(Activado)</span>
+                    </button>
+                    <button id="numbers" class="toggle-btn active" aria-pressed="true" title="Haga clic para activar/desactivar los números">
+                        <span class="icon">0</span> Números (0-9)
+                        <span class="sr-only">(Activado)</span>
+                    </button>
+                    <button id="symbols" class="toggle-btn" aria-pressed="false" title="Haga clic para activar/desactivar los símbolos especiales">
+                        <span class="icon">!</span> Símbolos (!@#...)
+                        <span class="sr-only">(Desactivado)</span>
+                    </button>
+                </div>
+                
+                <button id="generateBtn" class="primary-btn">
+                    <i class="fas fa-sync-alt"></i> Generar Contraseña
+                </button>
+            </section>
+
+            <!-- Sección de Resultados -->
+            <section class="result-section">
+                <div class="password-display">
+                    <input type="text" id="passwordResult" readonly value="Tu contraseña aparecerá aquí" aria-label="Contraseña generada">
+                    <button id="copyBtn" class="copy-btn" aria-label="Copiar contraseña">
+                        <i class="fas fa-copy"></i>
+                    </button>
+                </div>
+            </section>
+
+            <!-- Sección de Análisis de Seguridad -->
+            <section class="security-section">
+                <div class="security-card">
+                    <h2>Análisis de Seguridad</h2>
+                    <div class="security-details">
+                        <p id="combinations">Combinaciones posibles: |C|^k = 0</p>
+                        <div class="security-level">
+                            <span>Nivel: </span>
+                            <span id="securityLevel" class="level-indicator">Sin generar</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            <div class="math-note">                <details>
+                    <summary>Base Matemática</summary>
+                    <p>Este generador utiliza la teoría de conjuntos para los caracteres disponibles y combinatoria para calcular el número total de posibles contraseñas.</p>
+                    <p>Los conjuntos de caracteres son:</p>
+                    <ul style="margin-left: 20px; list-style-type: disc;">
+                        <li><strong>M</strong> = Minúsculas (a-z): 26 caracteres</li>
+                        <li><strong>Ma</strong> = Mayúsculas (A-Z): 26 caracteres</li>
+                        <li><strong>N</strong> = Números (0-9): 10 caracteres</li>
+                        <li><strong>S</strong> = Símbolos (!@#$...): 30 caracteres</li>
+                    </ul>
+                    <p>Con los conjuntos seleccionados, creamos un conjunto C = M ∪ Ma ∪ N ∪ S (unión de todos los conjuntos activos).</p>
+                    <p>Con longitud k (seleccionada con el slider), existen |C|^k combinaciones posibles, donde |C| es el número total de caracteres disponibles.</p>
+                </details>
+            </div>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
