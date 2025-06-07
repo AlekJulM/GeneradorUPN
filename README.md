@@ -84,7 +84,7 @@ cd generador-contrasenas
 
 ## 👥 Equipo
 
-Desarrollado como proyecto grupal por estudiantes apasionados por la seguridad informática y las matemáticas aplicadas.
+Desarrollado como proyecto grupal por estudiantes de la Universidad Privada del Norte para el curso de Matematicas Discretas.
 
 ## 📄 Licencia
 
