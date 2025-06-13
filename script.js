@@ -4,25 +4,21 @@ document.addEventListener('DOMContentLoaded', function() {
     const characterSets = {
         lowercase: {
             chars: 'abcdefghijklmnopqrstuvwxyz',
-            size: 26,
             active: true,
             element: document.getElementById('lowercase')
         },
         uppercase: {
             chars: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
-            size: 26,
             active: true,
             element: document.getElementById('uppercase')
         },
         numbers: {
             chars: '0123456789',
-            size: 10,
             active: true,
             element: document.getElementById('numbers')
         },
         symbols: {
             chars: '!@#$%^&*()_+-=[]{};:\'",.<>/?\\|',
-            size: 30,
             active: false,
             element: document.getElementById('symbols')
         }
@@ -40,7 +36,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // Estado inicial
     let passwordLength = parseInt(passwordLengthSlider.value);
     updateLengthLabel();
-    updateToggleButtons();
 
     // Event Listeners
     passwordLengthSlider.addEventListener('input', function() {
@@ -52,7 +47,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // Botones de conjuntos de caracteres
     for (const setKey in characterSets) {
         if (characterSets.hasOwnProperty(setKey)) {
-            const set = characterSets[setKey];            set.element.addEventListener('click', function() {
+            const set = characterSets[setKey];
+            set.element.addEventListener('click', function() {
                 set.active = !set.active;
                 this.classList.toggle('active');
                 this.setAttribute('aria-pressed', set.active);
@@ -79,16 +75,6 @@ document.addEventListener('DOMContentLoaded', function() {
         lengthLabel.textContent = `Longitud: ${passwordLength} caracteres`;
     }
 
-    function updateToggleButtons() {
-        for (const setKey in characterSets) {
-            if (characterSets.hasOwnProperty(setKey)) {
-                const set = characterSets[setKey];
-                set.element.classList.toggle('active', set.active);
-                set.element.setAttribute('aria-pressed', set.active);
-            }
-        }
-    }
-
     function getSelectedCharacters() {
         // Unión de conjuntos seleccionados: C = M ∪ Ma ∪ N ∪ S
         let chars = '';
@@ -110,69 +96,74 @@ document.addEventListener('DOMContentLoaded', function() {
         };
     }
 
-    function calculateCombinations(charactersLength, passwordLength) {
-        // Fórmula combinatoria: |C|^k
-        if (charactersLength === 0) return 0;
+    function calculateCombinations(charCount, length) {
+        // Para tamaños pequeños podemos usar Math.pow directamente
+        if (charCount <= 0 || length <= 0) return '0';
         
-        // Para números muy grandes, utilizamos notación científica
-        const exponent = passwordLength;
-        const base = charactersLength;
-        
-        if (exponent > 20) {
-            // Para exponentes muy grandes, usamos logaritmos
-            const result = exponent * Math.log10(base);
-            return `10^${result.toFixed(2)}`;
-        } else {
-            // Para valores manejables, calculamos directamente
-            let result = 1;
-            for (let i = 0; i < exponent; i++) {
-                result *= base;
-                // Si el resultado es demasiado grande, cambiamos a notación científica
-                if (result > 1e15) {
-                    return `${(result / Math.pow(10, Math.floor(Math.log10(result)))).toFixed(2)}e+${Math.floor(Math.log10(result))}`;
-                }
-            }
-            return result.toLocaleString();
+        // Para números moderados (que no requieren BigInt)
+        if (length < 15 && charCount < 10) { // Estos límites son conservadores
+            return Math.pow(charCount, length).toLocaleString();
         }
+        
+        // Para números grandes, usamos BigInt para precisión exacta
+        const combinationsBigInt = BigInt(charCount) ** BigInt(length);
+        const numStr = combinationsBigInt.toString();
+        
+        // Formateamos el número con comas cada tres dígitos para mejor legibilidad
+        let formattedStr = '';
+        for (let i = 0; i < numStr.length; i++) {
+            // Agregamos coma cada tres dígitos desde el final
+            if (i > 0 && (numStr.length - i) % 3 === 0) {
+                formattedStr += ',';
+            }
+            formattedStr += numStr[i];
+        }
+        
+        return formattedStr;
     }
 
     function evaluateSecurityLevel(combinationsCount) {
-        // Si combinationsCount es una cadena (notación científica), la convertimos
-        let numCombinations;
-        if (typeof combinationsCount === 'string') {
-            if (combinationsCount.includes('10^')) {
-                numCombinations = parseFloat(combinationsCount.replace('10^', ''));
-                numCombinations = Math.pow(10, numCombinations);
-            } else if (combinationsCount.includes('e+')) {
-                const parts = combinationsCount.split('e+');
-                numCombinations = parseFloat(parts[0]) * Math.pow(10, parseFloat(parts[1]));
+        // Límites de seguridad
+        const MILLION = 1000000;        // 10^6
+        const TRILLION = 1000000000000; // 10^12
+        
+        // Caso 1: Formato "A.B × 10^C" (notación científica)
+        if (typeof combinationsCount === 'string' && combinationsCount.includes('×') && combinationsCount.includes('10^')) {
+            const parts = combinationsCount.split('×');
+            const exponent = parseInt(parts[1].trim().replace('10^', ''));
+            
+            // Determinar directamente por el exponente
+            if (exponent < 6) return { level: 'Débil', class: 'level-weak' };
+            if (exponent < 12) return { level: 'Media', class: 'level-medium' };
+            return { level: 'Fuerte', class: 'level-strong' };
+        }
+        
+        // Caso 2: Formato con comas (1,234,567)
+        if (typeof combinationsCount === 'string' && combinationsCount.includes(',')) {
+            // Eliminar comas para obtener el número puro
+            const numStr = combinationsCount.replace(/,/g, '');
+            const digitCount = numStr.length;
+            
+            // Para números muy grandes, evaluamos por cantidad de dígitos
+            // porque pueden exceder la capacidad de Number
+            if (digitCount < 7) {
+                return { level: 'Débil', class: 'level-weak' };
+            } else if (digitCount < 13) {
+                return { level: 'Media', class: 'level-medium' };
             } else {
-                numCombinations = parseFloat(combinationsCount.replace(/,/g, ''));
+                return { level: 'Fuerte', class: 'level-strong' };
             }
-        } else {
-            numCombinations = combinationsCount;
         }
-
-        // Clasificar seguridad
-        const millón = 1e6;
-        const billón = 1e12;
-
-        if (numCombinations < millón) {
-            return {
-                level: 'Débil',
-                class: 'level-weak'
-            };
-        } else if (numCombinations < billón) {
-            return {
-                level: 'Media',
-                class: 'level-medium'
-            };
-        } else {
-            return {
-                level: 'Fuerte',
-                class: 'level-strong'
-            };
+        
+        // Caso 3: Es un número directo
+        if (typeof combinationsCount === 'number') {
+            if (combinationsCount < MILLION) return { level: 'Débil', class: 'level-weak' };
+            if (combinationsCount < TRILLION) return { level: 'Media', class: 'level-medium' };
+            return { level: 'Fuerte', class: 'level-strong' };
         }
+        
+        // Caso fallback: No se pudo determinar
+        return { level: 'No determinado', class: 'level-weak' };
     }
 
     function updateSecurityAnalysis() {
@@ -180,15 +171,21 @@ document.addEventListener('DOMContentLoaded', function() {
         const charCount = selectedChars.chars.length;
         
         const combinations = calculateCombinations(charCount, passwordLength);
-        combinationsDisplay.textContent = `Combinaciones posibles: |C|^k = ${combinations}`;
         
+        // Formateo más legible de las combinaciones
+        let displayCombinations = combinations;
+        if (typeof combinations === 'string' && combinations.includes('×') && combinations.includes('10^')) {
+            // Formato científico: convertir a HTML con superíndice
+            displayCombinations = combinations.replace(' × 10^', ' × 10<sup>').concat('</sup>');
+        }
+        
+        // Actualizar la visualización
+        combinationsDisplay.innerHTML = `Combinaciones posibles: |C|<sup>k</sup> = ${displayCombinations}`;
+        
+        // Evaluar y mostrar nivel de seguridad
         const security = evaluateSecurityLevel(combinations);
         securityLevelDisplay.textContent = security.level;
-        
-        // Eliminar clases previas
-        securityLevelDisplay.classList.remove('level-weak', 'level-medium', 'level-strong');
-        // Añadir la nueva clase
-        securityLevelDisplay.classList.add(security.class);
+        securityLevelDisplay.className = 'level-indicator ' + security.class;
     }
 
     function generateRandomChar(chars) {
@@ -208,7 +205,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const chars = selectedChars.chars;
         let password = '';
         
-        // Generar contraseña con selección aleatoria de caracteres con reemplazamiento
+        // Generar contraseña con selección aleatoria de caracteres con reemplazo
         for (let i = 0; i < passwordLength; i++) {
             password += generateRandomChar(chars);
         }
