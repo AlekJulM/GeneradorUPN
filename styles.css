@@ -111,9 +111,22 @@ header p { color: var(--blue); font-size: 1.1rem; }
     padding: .3rem .8rem; border-radius: 20px;
     font-weight: bold; color: var(--white); background: #aaa;
 }
-.level-weak { background: #dc3545; }
-.level-medium { background: #fd7e14; }
-.level-strong { background: #28a745; }
+
+/* Estilos para los niveles de seguridad */
+.level-weak { background: #dc3545; color: var(--white); }
+.level-medium { background: #fd7e14; color: var(--white); }
+.level-strong { background: #28a745; color: var(--white); }
+
+/* Estilos para niveles de seguridad en texto de explicación */
+.math-note .level-weak, 
+.math-note .level-medium, 
+.math-note .level-strong {
+    display: inline-block;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: bold;
+    color: var(--white);
+}
 
 /* Pie de página */
 footer {
