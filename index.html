@@ -62,8 +62,7 @@
             <section class="security-section">
                 <div class="security-card">
                     <h2>Análisis de Seguridad</h2>
-                    <div class="security-details">
-                        <p id="combinations">Combinaciones posibles: |C|^k = 0</p>
+                    <div class="security-details">                        <p id="combinations">Combinaciones posibles: |C|^k = 0</p>
                         <div class="security-level">
                             <span>Nivel: </span>
                             <span id="securityLevel" class="level-indicator">Sin generar</span>
@@ -71,14 +70,12 @@
                     </div>
                 </div>
             </section>
-        </main>
-
-        <footer>
-            <div class="math-note">                <details>
+        </main>        <footer>
+            <div class="math-note">
+                <details>
                     <summary>Base Matemática</summary>
                     <p>Este generador utiliza la teoría de conjuntos para los caracteres disponibles y combinatoria para calcular el número total de posibles contraseñas.</p>
-                    <p>Los conjuntos de caracteres son:</p>
-                    <ul style="margin-left: 20px; list-style-type: disc;">
+                    <p>Los conjuntos de caracteres son:</p>                    <ul style="margin-left: 20px; list-style-type: disc;">
                         <li><strong>M</strong> = Minúsculas (a-z): 26 caracteres</li>
                         <li><strong>Ma</strong> = Mayúsculas (A-Z): 26 caracteres</li>
                         <li><strong>N</strong> = Números (0-9): 10 caracteres</li>
@@ -86,10 +83,21 @@
                     </ul>
                     <p>Con los conjuntos seleccionados, creamos un conjunto C = M ∪ Ma ∪ N ∪ S (unión de todos los conjuntos activos).</p>
                     <p>Con longitud k (seleccionada con el slider), existen |C|^k combinaciones posibles, donde |C| es el número total de caracteres disponibles.</p>
+                    <h4>Niveles de seguridad:</h4>
+                    <ul style="margin-left: 20px; list-style-type: disc;">
+                        <li><span class="level-weak">Débil</span>: Menos de 10⁶ (1 millón) combinaciones</li>
+                        <li><span class="level-medium">Media</span>: Entre 10⁶ y 10¹² combinaciones</li>
+                        <li><span class="level-strong">Fuerte</span>: Más de 10¹² (1 billón) combinaciones</li>
+                    </ul>
                 </details>
             </div>
         </footer>
     </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
+
 
     <script src="script.js"></script>
 </body>
